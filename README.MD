@@ -2,8 +2,9 @@
 
 # Freya
 
-***is a distributed, fault-tolerant, linearizable key-value storage based on Raft ```
-https://github.com/lni/dragonboat``` and Badger ```https://github.com/dgraph-io/badger```***
+***is a distributed, fault-tolerant, linearizable key-value storage based on*** 
+1. Raft ```https://github.com/lni/dragonboat``` 
+2. Badger ```https://github.com/dgraph-io/badger```
 
 ## How to run 
 
