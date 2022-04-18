@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/despondency/freya/grpc"
 	"github.com/despondency/freya/internal/dto"
-	"github.com/francoispqt/gojay"
+	"github.com/golang/protobuf/proto"
 	"github.com/lni/dragonboat/v3"
 	"github.com/lni/dragonboat/v3/config"
 	sm "github.com/lni/dragonboat/v3/statemachine"
@@ -61,7 +62,7 @@ func NewRaftServer(dataDir string, nodeHost string, members map[uint64]string, j
 	}, nil
 }
 
-func (s *Server) Get(req *dto.GetRequest) (*dto.GetResponse, error) {
+func (s *Server) Get(req *grpc.GetRequest) (*grpc.GetResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	res := make(dto.StringSlice, 0)
@@ -81,20 +82,24 @@ func (s *Server) Get(req *dto.GetRequest) (*dto.GetResponse, error) {
 			}
 		}
 	}
-	return &dto.GetResponse{
+	return &grpc.GetResponse{
 		Values: res,
 	}, nil
 }
 
-func (s *Server) Put(req *dto.PutRequest) error {
+func (s *Server) Put(req *grpc.PutRequest) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	data, err := gojay.MarshalJSONObject(req)
+	//data, err := gojay.MarshalJSONObject(req)
+	//if err != nil {
+	//	panic(err)
+	//}
+	b, err := proto.Marshal(req)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	cs := s.nodeHost.GetNoOPSession(s.cfg.ClusterID)
-	_, err = s.nodeHost.SyncPropose(ctx, cs, data)
+	_, err = s.nodeHost.SyncPropose(ctx, cs, b)
 	if err != nil {
 		return err
 	}

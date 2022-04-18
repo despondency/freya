@@ -48,6 +48,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	rest := transport.NewRestTransport(*restPort, srv)
-	rest.StartTransport()
+	g := transport.NewGRPCServer(*restPort, srv)
+	g.StartServer()
+	//rest := transport.NewRestTransport(*restPort, srv)
+	//rest.StartTransport()
 }

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package grpc;
+
+import "google/protobuf/empty.proto";
+
+option go_package = ".;grpc";
+
+message GetRequest {
+  repeated string keys = 1;
+}
+
+message GetResponse {
+  repeated string values = 1;
+}
+
+message PutRequest {
+  repeated string keys = 1;
+  repeated string values = 2;
+}
+
+service Kv {
+  rpc Get(GetRequest) returns (GetResponse) {}
+  rpc Put(PutRequest) returns (google.protobuf.Empty) {}
+}

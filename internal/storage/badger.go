@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"github.com/despondency/freya/grpc"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/dgraph-io/badger/v3/pb"
 	"github.com/francoispqt/gojay"
@@ -165,6 +166,8 @@ func (b *BadgerStorage) queryAppliedIndex(db *badger.DB) (uint64, error) {
 
 func createDB(databaseDir string) (*badger.DB, error) {
 	opts := badger.DefaultOptions(databaseDir)
+	opts.NumGoroutines = 30
+	opts.NumCompactors = 5
 	return badger.Open(opts)
 }
 
@@ -323,12 +326,17 @@ func (b *BadgerStorage) Update(entries []sm.Entry) ([]sm.Entry, error) {
 	db := (*badger.DB)(atomic.LoadPointer(&b.db))
 	wb := db.NewWriteBatch()
 	for idx, e := range entries {
-		dataKV := &KVData{}
-		if err := gojay.UnmarshalJSONObject(e.Cmd, dataKV); err != nil {
+		//dataKV := &KVData{}
+		put := grpc.PutRequest{}
+		err := proto.Unmarshal(e.Cmd, &put)
+		if err != nil {
 			panic(err)
 		}
-		for i, k := range dataKV.Keys {
-			err := wb.Set([]byte(k), []byte(dataKV.Values[i]))
+		//if err := gojay.UnmarshalJSONObject(e.Cmd, dataKV); err != nil {
+		//	panic(err)
+		//}
+		for i, k := range put.Keys {
+			err := wb.Set([]byte(k), []byte(put.Values[i]))
 			if err != nil {
 				panic(err)
 			}
