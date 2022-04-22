@@ -1,5 +1,3 @@
-![alt text](https://static.wikia.nocookie.net/wowwiki/images/e/e4/Freya2.jpg)
-
 # Freya
 
 ***is a distributed, fault-tolerant, linearizable key-value storage based on*** 
